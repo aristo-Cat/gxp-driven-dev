@@ -352,7 +352,7 @@ The system acquires temperature readings at a fixed interval, stores them as the
 | `URS-DEVENV-002` | N | M | The configuration environment must be separate from the production environment. |
 
 > [!note] Instantiation observation (Cat 4 + mode develop)
-> The system is a configured product (Cat 4) but the manifest declares `mode: develop`. The DEVENV section has been interpreted as "configuration environment" rather than "code-development environment". This Cat4+develop combination is a semantic tension flagged as a smoke-test finding (see `SMOKE-TEST-REPORT.md`).
+> The system is a configured product (Cat 4) but the manifest declares `mode: develop`. The DEVENV section has been interpreted as "configuration environment" rather than "code-development environment". This Cat4+develop combination is a known, intentional semantic tension in this reference instance.
 
 ---
 
