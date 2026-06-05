@@ -1,0 +1,34 @@
+#!/bin/sh
+# gxp-driven-dev — L7 push lock (the most irreversible action gets the hardest lock).
+# anti-leak-guard scans the WORKING TREE only; the git HISTORY may still name the
+# source organization in old blobs. Policy: any public publish must be a CLEAN-SLATE /
+# ORPHAN commit, never a normal push of this history.
+
+cd "$(git rev-parse --show-toplevel)" || exit 1
+
+# Resolve a Python that actually RUNS (Windows ships a fake `python3` execution-alias stub
+# that resolves but errors — so we must execute each candidate, not just `command -v` it).
+PYTHON=""
+for _p in python3 python py; do
+  if command -v "$_p" >/dev/null 2>&1 && "$_p" -c "import sys" >/dev/null 2>&1; then
+    PYTHON="$_p"; break
+  fi
+done
+[ -n "$PYTHON" ] || { echo "[pre-push] no working Python interpreter found"; exit 1; }
+
+echo "[pre-push] anti-leak guard (working tree)..."
+"$PYTHON" skills/_scripts/anti-leak-guard.py || exit 1
+
+if [ "$GDD_ALLOW_PUSH" != "i-have-verified-history-is-clean" ]; then
+  echo ""
+  echo "BLOCKED: pre-push lock (L7)."
+  echo "'0 leaks' scans the working tree, NOT git history — it does not prove history is clean."
+  echo "The history may still name the source organization in old blobs."
+  echo "Publish via a CLEAN-SLATE / ORPHAN commit, never a normal push of this history."
+  echo "If you have verified the pushed history is clean, override:"
+  echo "  GDD_ALLOW_PUSH=i-have-verified-history-is-clean git push ..."
+  exit 1
+fi
+
+echo "[pre-push] override acknowledged — proceeding."
+exit 0

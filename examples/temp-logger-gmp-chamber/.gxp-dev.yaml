@@ -1,0 +1,40 @@
+# .gxp-dev.yaml — consumer manifest for the temperature-logger example
+# This is the FIRST end-to-end example of gxp-driven-dev, produced during the
+# 2026-05-29 smoke test of the `gdd.urs.from-idea` skill. Dummy / fictional system.
+
+project_id: "TEMPLOG-2026-001"
+project_name: "Temperature Data Logger for GMP Storage Chamber"
+
+mode: develop            # per agreed smoke-test plan (STATE.md 2026-05-29)
+lifecycle: v-model
+profile: pharma
+rigor_level: regulated
+gamp_category: 4         # configured COTS monitoring platform
+
+id_scheme: canonical     # uses the 22 canonical category codes
+custom_alias: {}
+
+presets:
+  part11_active: true    # electronic records are the primary GxP record + e-signed reports
+  annex11_active: true   # EU site
+  gdpr_active: false      # no personal data beyond operator usernames (out of DPIA scope here)
+  annex22_active: false   # no AI/ML component
+
+language: en             # English canonical (template translated to en on 2026-05-29, F1 fix)
+
+templates_active:
+  - URS
+  - GXP-ASSESS
+  - RA-INIT
+  - FS
+  - RA-DET
+  - IQ
+  - OQ
+  - PQ
+  - RTM
+  - VR
+
+outputs:
+  specs: true
+  evidence: true
+  compliance_bundle: true

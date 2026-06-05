@@ -1,0 +1,65 @@
+# OS / IDE
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+
+# Python (if any tooling scripts)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Node (if any tooling scripts)
+node_modules/
+npm-debug.log
+.pnpm-debug.log
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Temp / scratch
+.tmp/
+tmp/
+*.tmp.md
+*~
+*.stackdump
+
+# Secrets / credentials — defense-in-depth (none currently present; never commit these)
+.env
+.env.*
+*.key
+*.pem
+*.p12
+*.pfx
+*.crt
+*.secret
+secrets.*
+credentials.*
+id_rsa*
+*_rsa
+.netrc
+
+# Private working journal + living memory (NOT FOR PUBLIC REPO)
+# Contain internal session notes, parent-vault cross-references, raw thinking,
+# operational metadata, the maintainer's name, and pivots that must not appear in published history.
+PROGRESS.md
+STATE.md
+
+# Pre-publication audit record (private)
+PRE-PUBLISH-AUDIT.md
+
+# Anti-leak overlay — organization-specific patterns for anti-leak-guard.py.
+# Local/private only; NEVER commit (it would leak the very terms it protects).
+.leak-overlay.txt
+
+# Obsidian metadata — do not commit
+.obsidian/
+
+# OneDrive markers
+.~lock.*

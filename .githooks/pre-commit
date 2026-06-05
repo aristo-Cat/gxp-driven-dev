@@ -1,0 +1,61 @@
+#!/bin/sh
+# gxp-driven-dev — L7 commit lock. The file ASKS; this hook ENFORCES.
+# Catches: (A) anonymization leak · (C) CLAUDE.md drift from the @AGENTS.md single source · (D) staged frontmatter.
+# Bypass consciously with `git commit --no-verify` (never as a habit).
+
+cd "$(git rev-parse --show-toplevel)" || exit 1
+
+# Resolve a Python that actually RUNS (Windows ships a fake `python3` execution-alias stub
+# that resolves but errors — so we must execute each candidate, not just `command -v` it).
+PYTHON=""
+for _p in python3 python py; do
+  if command -v "$_p" >/dev/null 2>&1 && "$_p" -c "import sys" >/dev/null 2>&1; then
+    PYTHON="$_p"; break
+  fi
+done
+[ -n "$PYTHON" ] || { echo "[pre-commit] no working Python interpreter found"; exit 1; }
+fail=0
+
+# (A) Anti-leak — whole tree (maximum defense for the #1 red line).
+echo "[pre-commit] (A) anti-leak guard..."
+if ! "$PYTHON" skills/_scripts/anti-leak-guard.py; then
+  echo "  BLOCKED: anti-leak guard found a leak."
+  fail=1
+fi
+
+# (C) Single source — every CLAUDE.md must be the @AGENTS.md import stub (L10), not a copy.
+echo "[pre-commit] (C) CLAUDE.md is the @AGENTS.md single-source stub..."
+for c in $(find . -path ./.git -prune -o -name CLAUDE.md -print); do
+  a="$(dirname "$c")/AGENTS.md"
+  if [ ! -f "$a" ]; then
+    echo "  BLOCKED: $a missing ($c must import a sibling AGENTS.md)."
+    fail=1
+  elif ! grep -q '^@AGENTS\.md$' "$c"; then
+    echo "  BLOCKED: $c must be the @AGENTS.md stub; edit AGENTS.md, not CLAUDE.md."
+    fail=1
+  fi
+done
+
+# (D) Frontmatter on staged templates / example specs.
+echo "[pre-commit] (D) frontmatter on staged templates/specs..."
+for f in $(git diff --cached --name-only --diff-filter=ACM); do
+  case "$f" in
+    */CLAUDE.md|*/AGENTS.md) ;;                 # local rule files have no frontmatter — skip
+    templates/csv/*.md)
+      if ! "$PYTHON" skills/_scripts/validate-frontmatter.py --dry-run "$f"; then
+        echo "  BLOCKED: invalid frontmatter in $f"; fail=1
+      fi ;;
+    examples/*/specs/RTM.md) ;;                 # RTM is derived (generated), not an instance — skip (matches CI)
+    examples/*/specs/*.md)
+      if ! "$PYTHON" skills/_scripts/validate-frontmatter.py "$f"; then
+        echo "  BLOCKED: invalid frontmatter in $f"; fail=1
+      fi ;;
+  esac
+done
+
+if [ "$fail" -ne 0 ]; then
+  echo "[pre-commit] FAILED — fix the above (or bypass intentionally with --no-verify)."
+  exit 1
+fi
+echo "[pre-commit] OK."
+exit 0

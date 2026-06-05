@@ -1,0 +1,113 @@
+---
+description: Interactive interview that produces a specs/URS.md (User Requirements Specification) from a project idea, scaled by the project's .gxp-dev.yaml manifest. Use when starting a new gxp-driven-dev project (no specs/URS.md yet), when the user says "I want to build X" or "let's spec out X", or after the project manifest exists. Anti-hallucination: never invents requirement IDs, regulatory citations, or category codes.
+globs:
+alwaysApply: false
+---
+
+# gdd.urs.from-idea — Interactive URS Instantiation (Cursor port)
+
+> **Cursor rule type: Manual.** No `globs`, `alwaysApply: false` → this rule is *not* auto-attached. Invoke it explicitly with `@gdd-urs-from-idea` when you want to run the URS interview. This mirrors the Claude Code `/gdd.urs.from-idea` slash command: the interview is a deliberate user action.
+>
+> **Shared core.** This rule re-expresses the *orchestration prose* only. The deterministic work — frontmatter validation, RTM generation, clarification-marker scan, anti-leak guard — is done by the harness-agnostic Python in `skills/_scripts/`, which you call by path. Do **not** re-implement any of it in this rule.
+>
+> Source of truth: `skills/urs-from-idea/SKILL.md` + `interview-flow.md` + `output-template.md`. Regenerate this rule from there; do not hand-patch it out of sync.
+
+You are conducting a structured interview to produce a **User Requirements Specification (URS)** instance from a project idea. The output is `specs/URS.md` in the consumer project, following the canonical pattern of `@templates/csv/URS.md`.
+
+## Pre-flight (do this FIRST, before any questions)
+
+1. **Locate `.gxp-dev.yaml`**: walk up from the workspace root to find it. If not found, **STOP** and tell the user: *"This project doesn't have a `.gxp-dev.yaml` manifest yet. Run the init step first to bootstrap, then re-invoke me with `@gdd-urs-from-idea`."*
+2. **Load the manifest** and remember: `mode` (develop/validate/hybrid), `lifecycle`, `profile` (pharma/medical-device/finance/aerospace/nuclear/general), `rigor_level` (light/standard/strict/regulated), `gamp_category` (1/3/4/5 if present), `id_scheme` (canonical/custom) + `custom_alias`, `presets.{part11_active, annex11_active, gdpr_active, annex22_active}`, `language` (en/es/…).
+3. **Locate the source template**: read `@templates/csv/URS.md`. This is your **authoritative reference** for structure, placeholders, and the **36 canonical preset requirements** (14 EREC + 18 ESIG + 2 SEC + 1 API + 1 MIGR; EREC/ESIG apply when `presets.part11_active: true`, the SEC/API/MIGR presets per their own activation questions — Annex 11 2025 modernization).
+4. **Check if `specs/URS.md` already exists**: if yes, ask the user — replace (start fresh), append, or abort. If no, proceed.
+
+## Interview flow
+
+Ask **one question or one tight cluster at a time**; echo a 1-line confirmation after each cluster; lock each phase before advancing. Adapt depth to `rigor_level` (a `light` Cat 1 utility compresses phases 6-10; a `regulated` Cat 5 custom system expands every phase).
+
+**Interaction principles (apply to every question):**
+1. **Propose a default with reasoning, then ask to confirm or change** — never an open-ended "what do you want?". A proposed default the user *confirms* is grounded; an unconfirmed value you wrote into the URS is invention. Always get the confirmation before it lands in a requirement.
+2. **Use Cursor's choice affordances for discrete options, free text for open input.** GAMP category, priority (H/M/L), GxP (Y/N), mode, applicability → offer the options explicitly; intended use, requirement wording, names → free text.
+3. **One decision (or tight cluster) at a time, in sequence.**
+4. **Adapt interview depth to the system**; if the user shows decision fatigue, offer "use my recommended defaults for the rest of this phase".
+
+| Phase | Asks for | Produces |
+|---|---|---|
+| 1 | System identity | `system_name`, `project_id`, `supplier`, `version`, `intended_use` (+ `gamp_category` if pharma and unset) |
+| 2 | Scope | `end_user_group`, `related_systems`, `project_purpose`, `out_of_scope` |
+| 3 | Functional requirements (iterative) | `URS-FUNC-NNN` rows |
+| 4 | Conditional Part 11 / Annex 11 | `URS-EREC-NNN` + `URS-ESIG-NNN` presets when active (copied **verbatim**) |
+| 5 | Performance + Quality + Deliverables | `URS-PERF-NNN`, `URS-QUAL-NNN`, `URS-DELIV-NNN` |
+| 6 | Lifecycle support | `URS-OPS-NNN`, `URS-ARCH-NNN`, `URS-MIGR-NNN` (if migration) |
+| 7 | UI / API / Hardware / Peripherals | `URS-UI-NNN`, `URS-API-NNN`, `URS-HW-NNN`, `URS-PERIPH-NNN` (if applicable) |
+| 8 | Process / Training / Docs | `URS-PROC-NNN`, `URS-TRAIN-NNN`, `URS-DOCS-NNN` |
+| 9 | Testing | `URS-TEST-NNN` |
+| 10 | Dev environment | `URS-DEVENV-NNN` (only if `mode: develop`) |
+| 11 | Signature block | author + reviewer(s) + approver(s) with departments |
+
+**Phase 4 specifics:** Do **not** ask the user to draft Electronic Records / Electronic Signatures requirements when `presets.part11_active: true` — copy `URS-EREC-001..014` and `URS-ESIG-001..018` **verbatim** from `@templates/csv/URS.md`. To mark any as N/A, **do not edit the verbatim row's `GxP` cell**; record it in a separate "System-specific determinations" note below the table (e.g. `URS-ESIG-018: N/A — no hybrid wet-ink signatures used`). If `part11_active: false`, skip phase 4 and write a single "Not applicable per `.gxp-dev.yaml`" sentence in §9.
+
+## Anti-hallucination rules (NON-NEGOTIABLE)
+
+1. **Never invent IDs.** Number sequentially after the last existing one in that category; empty category starts at `001`. Honor `id_scheme` (canonical `URS-FUNC-001`; custom applies `custom_alias`).
+2. **Never invent regulatory citations.** The 36 presets carry their own §-citations to 21 CFR Part 11 / EU Annex 11 — copy verbatim, never paraphrase the legal language.
+3. **Never invent package names, architectures, or technologies.** If the user hasn't stated the framework/database/language/cloud provider, ask or insert `[NEEDS CLARIFICATION: which X?]`.
+4. **Use `[NEEDS CLARIFICATION: …]` liberally** — always with the actual question after the colon. Never paper over an "I don't know".
+5. **Never skip the GxP / Prio columns.** Every row has `GxP (Y/N)` and `Prio (H/M/L)`. If unsure: `GxP=N`, `Prio=M`, + a clarification marker.
+6. **Honor the `language` field.** All generated content in the manifest's language; do not mix languages.
+7. **Read, do not write, the source template.** `templates/csv/URS.md` is read-only reference.
+
+## Status semantics
+
+`specs/URS.md` starts at `status: draft`. Instance frontmatter (substitute placeholders):
+
+```yaml
+---
+title: "URS — User Requirements Specification for {{system_name}}"
+type: instance
+based_on_template: "URS"
+based_on_template_version: "0.1.0"
+project_id: "{{project_id}}"
+status: draft
+version: "0.1"
+created: "{{today}}"
+updated: "{{today}}"
+language: "{{language from .gxp-dev.yaml}}"
+gamp_category: {{1|3|4|5 or null}}
+profile: "{{profile}}"
+mode: "{{mode}}"
+presets:
+  part11_active: {{bool}}
+  annex11_active: {{bool}}
+  gdpr_active: {{bool}}
+  annex22_active: {{bool}}
+---
+```
+
+**Never** set `status: in-review` or `status: approved` — that requires explicit human action through a later step.
+
+## Output shape
+
+Mirror `@templates/csv/URS.md` with placeholders substituted. Requirement sections use the table shape `| ID | GxP (Y/N) | Prio (H/M/L) | Requirement |`. Categories with no requirements are **omitted** (no empty sections, no empty rows). Section order: FUNC, EREC, ESIG, DATA, FLOW, REPORT, SEC, PERF, UI, API, MIGR, ARCH, OPS, PROC, DOCS, TRAIN, QUAL, TEST, DELIV, PERIPH, HW, DEVENV (DEVENV only if `mode: develop`).
+
+## Post-flight (do AFTER writing `specs/URS.md`) — call the shared Python core
+
+Run these from the consumer project root (adjust `<gdd-path>` to your `gxp-driven-dev` install). **Do not re-implement these checks in prose** — they are the deterministic core:
+
+```bash
+python <gdd-path>/skills/_scripts/validate-frontmatter.py specs/URS.md
+python <gdd-path>/skills/_scripts/check-clarification-markers.py specs/URS.md --draft
+```
+
+If `validate-frontmatter.py` fails, report the errors and **do not claim success**. The marker check is informational in draft (`--draft` exits 0).
+
+Then **print a summary**: requirements per category, total clarification markers, and the suggested next step:
+- `gamp_category` 4 or 5 → port `gdd.fs.from-urs` (FS) and `gdd.ra.from-urs` (Initial RA).
+- Always → the Initial Risk Assessment (`gdd.ra.from-urs`, GAMP 5 §M3 step 1).
+- Markers > 0 → resolve before promoting the URS out of `draft`.
+
+## When to refuse
+
+- `.gxp-dev.yaml` missing → redirect to the init step.
+- User wants to bypass an interview phase required by `rigor_level: strict`/`regulated` → refuse and explain.
+- User asks you to "just make up the requirements" → refuse; cite the anti-hallucination policy.

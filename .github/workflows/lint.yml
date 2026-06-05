@@ -1,0 +1,68 @@
+name: lint
+
+# CI lint for the gxp-driven-dev toolkit. Runs the deterministic gates:
+#  - frontmatter validation (templates + example instances)
+#  - RTM coherence (0 dangling references)
+#  - clarification-marker report (informational for drafts)
+#  - anti-corporate-leak guard (BLOCKING — enforces the CLAUDE.md anonymization rule)
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+  workflow_dispatch:
+
+# Least-privilege token: this workflow only reads the repo (no writes, no PR/issue mutation).
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r skills/_scripts/requirements.txt
+
+      - name: Anti-corporate-leak guard (blocking)
+        run: python skills/_scripts/anti-leak-guard.py
+
+      - name: Validate template frontmatter (--dry-run)
+        run: |
+          set -e
+          for f in templates/csv/*.md; do
+            python skills/_scripts/validate-frontmatter.py --dry-run "$f"
+          done
+
+      - name: Validate example spec instances
+        run: |
+          set -e
+          shopt -s nullglob
+          for f in examples/*/specs/*.md; do
+            [ "$(basename "$f")" = "RTM.md" ] && continue   # RTM is derived, not an instance
+            python skills/_scripts/validate-frontmatter.py "$f"
+          done
+
+      - name: RTM coherence — 0 dangling references
+        run: |
+          set -e
+          shopt -s nullglob
+          for d in examples/*/specs; do
+            [ -d "$d" ] || continue
+            python skills/_scripts/generate-rtm.py --specs-dir "$d"   # exits non-zero on dangling refs
+          done
+
+      - name: Clarification markers (informational — drafts expected)
+        run: |
+          shopt -s nullglob
+          for d in examples/*/specs; do
+            [ -d "$d" ] || continue
+            python skills/_scripts/check-clarification-markers.py --all --draft --specs-dir "$d"
+          done

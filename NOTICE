@@ -1,0 +1,15 @@
+gxp-driven-dev
+Copyright 2026 The gxp-driven-dev authors
+
+This product includes software and documentation developed as an
+open-source, AI-native, vendor-agnostic spec-driven development toolkit
+where pharma-grade rigor (inspired by ISPE GAMP 5) drives quality software
+construction by AI agents.
+
+Licensed under the Apache License, Version 2.0 (see the LICENSE file).
+
+The toolkit is inspired by — but does not copy, redistribute, or reproduce —
+any proprietary regulatory documentation. All templates, schemas, and
+patterns are original works generalized from public regulatory literature
+(FDA, EU, ICH, ISPE GAMP 5, ISO, PIC/S, WHO, MHRA) and from the lessons
+documented in docs/inspirations.md.
