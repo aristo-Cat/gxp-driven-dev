@@ -18,7 +18,7 @@ A Claude Code `SKILL.md` mixes two things; Codex wants them in two different hom
 | The **procedure** (pre-flight, interview/generation flow, output shape, post-flight) | `prompt.md` → slash `/gdd-<dashed-name>` | Invoked deliberately, only when the user runs the skill. |
 | The **always-on invariants** (anti-hallucination, linear status, anonymization, read-manifest-first) | a snippet pasted into the consumer's `AGENTS.md` | AGENTS.md is always merged into context, so the guardrails hold even mid-task when the slash prompt is not the active turn. |
 
-The reference port ships both: `gdd-urs-from-idea/prompt.md` + `gdd-urs-from-idea/AGENTS.snippet.md`.
+The reference port ships both: `gdd-urs-from-idea/prompt.md` + the shared `AGENTS.snippet.md` (at the `codex/` root, one file for the whole family).
 
 > **The `AGENTS.snippet.md` is shared across the whole skill family**, not per-skill. When you port skill #2..#6, **extend the same snippet** (it already states the invariants generically for "any `specs/*.md`"); do not create a second guardrail file.
 
@@ -27,7 +27,7 @@ The reference port ships both: `gdd-urs-from-idea/prompt.md` + `gdd-urs-from-ide
 1. **Copy** `gdd-urs-from-idea/prompt.md` → `gdd-<dashed-name>/prompt.md`. Dot→dash the Claude Code `name:` for the slash command (`gdd.ra.from-urs` → `/gdd-ra-from-urs`).
 2. **Frontmatter**: set `description:` from the source skill; set `argument-hint:` if the skill takes a seed input. Drop `allowed-tools:`.
 3. **Body**: paste the source `SKILL.md` procedure + the `generation-flow.md` / `interview-flow.md` summary table + the `output-template.md` shape. Reference inputs by repo-relative path (`templates/csv/<DOC>.md`, `specs/<UPSTREAM>.md`).
-4. **Guardrails**: do **not** add a new `AGENTS.snippet.md` — the shared one at `gdd-urs-from-idea/AGENTS.snippet.md` already covers all skills. If the new skill needs an invariant not yet listed, add it there.
+4. **Guardrails**: do **not** add a new `AGENTS.snippet.md` — the shared one at `adapters/codex/AGENTS.snippet.md` (the `codex/` root) already covers all skills. If the new skill needs an invariant not yet listed, add it there.
 5. **Post-flight**: keep every `python <gdd-path>/skills/_scripts/*.py` call **verbatim** — the deterministic shared core is identical across harnesses.
 6. **Anonymization**: these files are inside the toolkit tree, so `anti-leak-guard.py` scans them. Canonical acronyms only; no source-org names, doc codes, ID schemes, site codes, or heritage terms.
 

@@ -1,6 +1,6 @@
 # Adapters — `gxp-driven-dev` skills on other harnesses
 
-> **Status: `v0.5.0` adapter framework + reference port.** This directory establishes the **porting strategy** and ships **one fully-ported reference skill** (`gdd.urs.from-idea`) for both Cursor and OpenAI Codex CLI. The other 5 operative skills are **not yet ported** — they are documented as a mechanical follow-up using the pattern proved here. This is intentionally a framework + reference port, *not* a full port of the catalog.
+> **Status: `v0.5.0` adapter framework — Codex at full parity.** This directory establishes the **porting strategy** and shipped the first **reference skill** (`gdd.urs.from-idea`) for both Cursor and OpenAI Codex CLI. **Codex now ports all 12 operative skills** (`codex/<dashed-name>/prompt.md` each + the shared `codex/AGENTS.snippet.md`), built on the pattern proved by the reference port (see `codex/PORTING.md` and the status matrix below). **Cursor** remains at the single reference port — full Cursor parity is a separate future effort.
 
 The toolkit's skills are **Claude Code first** (`skills/<name>/SKILL.md`). Roadmap decision #5 ports them to other AI coding harnesses. This `adapters/` layer is how a single skill definition reaches Cursor and Codex without forking the logic.
 
@@ -62,20 +62,30 @@ Consequences:
 
 ---
 
-## Status matrix — 6 operative skills × 3 harnesses
+## Status matrix — 12 operative skills × 3 harnesses
 
-| Skill (Claude Code source) | Claude Code | Cursor (`.mdc`) | Codex (prompt + AGENTS.md) |
+All 12 skills are operative on Claude Code (the source of truth). Cursor has the single reference port; **Codex is now at full parity** — all 12 skills ported (`codex/<dashed-name>/prompt.md` each) + the shared `codex/AGENTS.snippet.md` guardrails. See `codex/PORTING.md`.
+
+| Skill (Claude Code source) | Claude Code | Cursor (`.mdc`) | Codex (`prompt.md` + shared `AGENTS.snippet.md`) |
 |---|---|---|---|
-| `gdd.urs.from-idea` | ✅ source of truth | ✅ **reference port** (`cursor/gdd-urs-from-idea.mdc`) | ✅ **reference port** (`codex/gdd-urs-from-idea/`) |
-| `gdd.ra.from-urs` | ✅ | ⬜ planned (port mechanically) | ⬜ planned |
-| `gdd.fs.from-urs` | ✅ | ⬜ planned | ⬜ planned |
-| `gdd.ra.detail.from-urs-fs` | ✅ | ⬜ planned | ⬜ planned |
-| `gdd.cs.from-fs` | ✅ | ⬜ planned | ⬜ planned |
-| `gdd.tests.from-ra` | ✅ | ⬜ planned | ⬜ planned |
+| **— Cascade —** | | | |
+| `gdd.urs.from-idea` | ✅ source of truth | ✅ reference port | ✅ `codex/gdd-urs-from-idea/` |
+| `gdd.ra.from-urs` | ✅ | ⬜ planned | ✅ `codex/gdd-ra-from-urs/` |
+| `gdd.fs.from-urs` | ✅ | ⬜ planned | ✅ `codex/gdd-fs-from-urs/` |
+| `gdd.ra.detail.from-urs-fs` | ✅ | ⬜ planned | ✅ `codex/gdd-ra-detail-from-urs-fs/` |
+| `gdd.cs.from-fs` | ✅ | ⬜ planned | ✅ `codex/gdd-cs-from-fs/` |
+| `gdd.tests.from-ra` | ✅ | ⬜ planned | ✅ `codex/gdd-tests-from-ra/` |
+| **— Entry / orchestration —** | | | |
+| `gdd.start` | ✅ | ⬜ planned | ✅ `codex/gdd-start/` |
+| `gdd.init` | ✅ | ⬜ planned | ✅ `codex/gdd-init/` |
+| `gdd.next` | ✅ | ⬜ planned | ✅ `codex/gdd-next/` |
+| `gdd.lifecycle` | ✅ | ⬜ planned | ✅ `codex/gdd-lifecycle/` |
+| `gdd.trace.validate` | ✅ | ⬜ planned | ✅ `codex/gdd-trace-validate/` |
+| `gdd.lint.spec` | ✅ | ⬜ planned | ✅ `codex/gdd-lint-spec/` |
 
-Legend: ✅ done · ⬜ planned (pattern proven, port is mechanical) · 🚫 blocked.
+Legend: ✅ done · ⬜ planned / in-progress · 🚫 blocked.
 
-> Stub skills (`trace-validate`, `lint-spec`, `init-project`, `next`, `lifecycle`) are **not** in scope for adapters until they are operative on Claude Code first.
+> **Cursor parity** is a separate future effort; this round targets **Codex** only. The shared deterministic core (`skills/_scripts/*.py`) is identical across all harnesses — adapters only re-express orchestration prose, never the Python.
 
 ---
 

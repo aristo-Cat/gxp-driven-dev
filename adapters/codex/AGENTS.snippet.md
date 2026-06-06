@@ -27,3 +27,13 @@ When generating or editing any `specs/*.md` in this project (URS, FS, RA-INIT, R
 8. **Anonymization (if this project is derived from the toolkit's own tree).** Use only the 22 canonical category acronyms (FUNC, EREC, ESIG, QUAL, TRAIN, DEVENV, DATA, FLOW, REPORT, PROC, UI, API, MIGR, ARCH, OPS, DOCS, TEST, DELIV, PERIPH …). Never introduce a source-organization name, corporate document code, corporate ID scheme, site code, or non-English heritage term for "category code".
 
 9. **The deterministic checks are scripts, not prose.** After writing a spec, run the harness-agnostic Python from `<gdd-path>/skills/_scripts/` (`validate-frontmatter.py`, `check-clarification-markers.py --draft`, `generate-rtm.py`). If `validate-frontmatter.py` fails, do not claim the spec is valid.
+
+### Additional invariants for toolkit-operation skills (init / routers / gates)
+
+These hold for the non-authoring skills too, so they belong in the always-on file:
+
+10. **Never overwrite the manifest.** `.gxp-dev.yaml` is the project contract. The bootstrap step may create it or amend explicit fields, but no skill silently overwrites an existing manifest — if one exists, amend or stop and ask (overwrite / amend / abort).
+
+11. **Routers author nothing.** Orientation skills (`next`, `lifecycle`, `start`) only read state and recommend the next move — they never write a spec or the manifest. To produce an artifact, hand off to the producing skill.
+
+12. **Never weaken a gate to make it pass.** Do not edit a `validation_rule`, a preset, a regulatory citation, or the Python in `_scripts/` just to turn `validate-frontmatter` / `trace` / `lint` green. Fix the spec, never the gate.

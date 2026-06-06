@@ -46,7 +46,7 @@ The fix is not less AI; the fix is **better specs**. Structured, versioned, trac
 
 ## What it is, in one paragraph
 
-A toolkit of **AI-callable skills** (Claude Code-first, port to Cursor / Codex in 3-6 months) that potentiate AI agents with **33 canonical Markdown templates** (URS, FS, DS, IQ, OQ, PQ, RA-INIT, RA-DET, CR, RTM, VR, PR, CC, IR, and 19 more) carrying **declarative YAML frontmatter** (typed placeholders, presets, validation rules, downstream consumers, instance frontmatter spec). Skills are **generative**: they draft cascade-down (URS → FS → RA → tests → code stubs) using approved upstream specs as authoritative context. Auxiliary Python 3.12+ scripts handle deterministic tasks (validate frontmatter, generate RTM, lint specs, slopcheck against package hallucinations). Output is **modular** per `.gxp-dev.yaml` manifest: specs + code + tests + docs + optional compliance bundle for regulated audits.
+A toolkit of **AI-callable skills** (Claude Code-first; **ported to OpenAI Codex at full parity**, plus a Cursor reference port) that potentiate AI agents with **33 canonical Markdown templates** (URS, FS, DS, IQ, OQ, PQ, RA-INIT, RA-DET, CR, RTM, VR, PR, CC, IR, and 19 more) carrying **declarative YAML frontmatter** (typed placeholders, presets, validation rules, downstream consumers, instance frontmatter spec). Skills are **generative**: they draft cascade-down (URS → FS → RA → tests → code stubs) using approved upstream specs as authoritative context. Auxiliary Python 3.12+ scripts handle deterministic tasks (validate frontmatter, generate RTM, lint specs, slopcheck against package hallucinations). Output is **modular** per `.gxp-dev.yaml` manifest: specs + code + tests + docs + optional compliance bundle for regulated audits.
 
 ---
 
@@ -231,7 +231,7 @@ Reusable design patterns referenced from multiple templates (FMEA, V-Model deliv
 
 ### Layer 3 — Skills (`skills/`)
 
-AI-callable skills that operate on templates and produce instances or validation reports. Designed for Claude Code first; port to Cursor / Codex in `v0.5.0`. Auxiliary scripts in Python 3.12+ handle deterministic tasks.
+AI-callable skills that operate on templates and produce instances or validation reports. Designed for Claude Code first; **OpenAI Codex is at full parity** (all 12 skills under `adapters/codex/`), with a Cursor reference port (`adapters/cursor/`). Auxiliary scripts in Python 3.12+ handle deterministic tasks.
 
 ---
 
@@ -379,7 +379,7 @@ outputs:
 | Milestone | Scope |
 |---|---|
 | **`v0.1.0`** | 33 templates Round 1 + 6 patterns + 5 skills + 1 worked example + CI lint |
-| **`v0.5.0`** | All templates Round 2 (formal schemas, output schemas, agnostic markdown links) + 10-15 skills + Cursor/Codex adapters + 2 examples |
+| **`v0.5.0`** | All templates Round 2 (formal schemas, output schemas, agnostic markdown links) + 10-15 skills + Codex adapters (full parity) + Cursor reference port + 2 examples |
 | **`v1.0.0`** | Feature-complete, externally documented, community-ready, public release (license applied: Apache 2.0) |
 | **`v2.0.0`** | Community contributions integrated; coverage of additional regulatory regimes (medical devices ISO 13485 / IEC 62304, aerospace DO-178C, automotive ISO 26262) |
 
