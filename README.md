@@ -130,10 +130,11 @@ Status:
 - `VMP` — Round 1 in progress (Sprint 2 — next)
 - 31 templates planned for Round 1 across `v0.1.0`
 
-### Skills (10 folders planned)
+### Skills (12 folders)
 
 | Skill | Status | Role |
 |---|---|---|
+| `gdd.start` | Operative | Zero-state front door — asks how to begin, routes to `init`/`next`/`lifecycle` |
 | `gdd.urs.from-idea` | Sprint 2 (operative) | Interactive interview → `specs/URS.md` |
 | `gdd.fs.from-urs` | Stub | Draft `specs/FS.md` from approved URS |
 | `gdd.ra.from-urs` | Stub | Initial Risk Assessment (GAMP 5 §M3 step 1) |

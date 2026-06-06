@@ -19,6 +19,7 @@ skills/
 │   ├── lint-spec.py                ← combines the 3 above
 │   └── lib/
 │       └── gdd_common.py           ← shared helpers (parse frontmatter, walk specs)
+├── start/                          ← zero-state front door (asks how to begin, routes)
 ├── urs-from-idea/                  ← one folder per skill (kebab-case, no prefix)
 │   ├── SKILL.md                    ← Claude Code skill entry point
 │   ├── interview-flow.md           ← (optional) interview question order
@@ -43,6 +44,7 @@ skills/
 
 | Folder | Slash command | Status | Role |
 |---|---|---|---|
+| `start/` | `/gdd.start` | ⚡ Operative (v0.5.0) | **Zero-state front door**: detect manifest → ask how to begin → route to `/gdd.init` (build paths) or `/gdd.next` / `/gdd.lifecycle` (existing project). Read-only |
 | `urs-from-idea/` | `/gdd.urs.from-idea` | ⚡ Operative (Sprint 2) | Interactive interview → `specs/URS.md` |
 | `fs-from-urs/` | `/gdd.fs.from-urs` | ⚡ Operative (Sprint 2) | Functional Spec (GAMP 5 §D1) — realizes URS GxP=Y → `specs/FS.md` (full coverage) |
 | `ra-from-urs/` | `/gdd.ra.from-urs` | ⚡ Operative (Sprint 2) | Initial Risk Assessment (GAMP 5 §M3 steps 1-2) → `specs/RA-INIT.md` |
